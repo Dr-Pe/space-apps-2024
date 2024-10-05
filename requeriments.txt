@@ -2,3 +2,4 @@ pygame
 numpy
 networkx
 colour-science
+pygame-menu
