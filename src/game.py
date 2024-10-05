@@ -51,29 +51,29 @@ class Game:
             # Obtener el color RGB en la posición del mouse
             rgb = self.background_img.get_at(
                 event.pos)[:3]  # Obtener solo R, G, B
-            nm = self.rgb_to_nm(rgb)  # Llamar al método de conversión
+            nm = self.rgb_to_wavelength(rgb)  # Llamar al método de conversión
 
             print(f"RGB: {rgb}, Longitud de onda: {nm} nm")
 
-            self.play_sound_from_nm(nm)
+            self.play_sound_from_wavelength(nm)
 
     def set_background_image(self):
         self.background_img = self.back_images[self.current_image_index].background_img
         return self.background_img
 
-    def rgb_to_nm(self, rgb):
+    def rgb_to_wavelength(self, rgb):
         rgb_normalized = np.array(rgb) / 255.0
         illuminant = colour.SDS_ILLUMINANTS["FL2"]
-        ret = colour.convert(
+        res = colour.convert(
             rgb_normalized,
             "sRGB",
             "Dominant Wavelength",
             sd_to_XYZ={"illuminant": illuminant},
         )
 
-        return ret[0]
+        return res[0]
 
-    def play_sound_from_nm(self, nm):
+    def play_sound_from_wavelength(self, nm):
         # Convertir nanómetros a metros
         wavelength_m = nm * 1e-9  # convertir nm a metros
         # Calcular la frecuencia
