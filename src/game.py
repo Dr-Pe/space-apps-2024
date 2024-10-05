@@ -1,8 +1,8 @@
-import pygame
-import numpy as np
 import colour
+import numpy as np
+import pygame
 
-pygame.mixer.init(frequency=44100, size=-16, channels=1)
+pygame.mixer.init(frequency=44100, size=-16, channels=2)
 
 
 class Game:
@@ -25,7 +25,7 @@ class Game:
 
             # Fill the screen with the image
             self.set_background_image()
-            self.screen.blit(self.background_img, (0, 0))
+            self.screen.blit(self.background_img.background_img, (0, 0))
 
             # Render your game here
 
@@ -49,29 +49,16 @@ class Game:
                     self.current_image_index - 1) % len(self.back_images)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             # Obtener el color RGB en la posición del mouse
-            rgb = self.background_img.get_at(
-                event.pos)[:3]  # Obtener solo R, G, B
-            nm = self.rgb_to_wavelength(rgb)  # Llamar al método de conversión
+            wavelength = self.background_img.get_dominant_wavelenght_at(
+                event.pos)
 
-            print(f"RGB: {rgb}, Longitud de onda: {nm} nm")
+            print(f"Longitud de onda: {wavelength} nm")
 
-            self.play_sound_from_wavelength(nm)
+            self.play_sound_from_wavelength(wavelength)
 
     def set_background_image(self):
-        self.background_img = self.back_images[self.current_image_index].background_img
+        self.background_img = self.back_images[self.current_image_index]
         return self.background_img
-
-    def rgb_to_wavelength(self, rgb):
-        rgb_normalized = np.array(rgb) / 255.0
-        illuminant = colour.SDS_ILLUMINANTS["FL2"]
-        res = colour.convert(
-            rgb_normalized,
-            "sRGB",
-            "Dominant Wavelength",
-            sd_to_XYZ={"illuminant": illuminant},
-        )
-
-        return res[0]
 
     def play_sound_from_wavelength(self, nm):
         # Convertir nanómetros a metros
@@ -97,13 +84,10 @@ class Game:
 
         # Convertir a tipo de datos de audio
         sound_wave = (sound_wave * 32767).astype(np.int16)  # convertir a int16
+        # Si es estéreo, duplicamos el canal (lo seteamos como estereo en el init, revisar)
         sound_wave = sound_wave.reshape(-1, 1)  # Convertir a 2D
-        if pygame.mixer.get_num_channels() == 1:  # Si el mixer está en mono
-            # Convertir a forma (n_samples, 1)
-            sound_wave = sound_wave.reshape(-1, 1)
-        else:  # Si es estéreo, duplicamos el canal
-            sound_wave = np.column_stack(
-                (sound_wave, sound_wave))  # Crear un array estéreo
+        sound_wave = np.column_stack(
+            (sound_wave, sound_wave))  # Crear un array estéreo
 
         # Crear un objeto de sonido y reproducirlo
         # Sin flatten o reshape, debería funcionar
