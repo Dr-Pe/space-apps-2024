@@ -24,8 +24,9 @@ if __name__ == "__main__":
     ruta_entorno = ruta_entorno+".venv"
     crear_entorno(ruta_entorno)
     bibliotecas = [
-        'numpy',
         'pygame',
         'colour-science',
+        'numpy',
+        'networkx'
     ]
     instalar_bibliotecas(ruta_entorno, bibliotecas)
