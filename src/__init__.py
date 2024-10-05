@@ -14,8 +14,8 @@ if __name__ == '__main__':
         os.path.dirname(__file__)), 'static')
 
     # List all files in the "static" dir
-    img_names = [os.path.join(static_dir, file)
-                 for file in os.listdir(static_dir)]
+    img_names = [os.path.join(static_dir, file.name)
+                 for file in os.scandir(static_dir) if file.is_file()]
 
     Game([BackgroundImage(img_name) for img_name in img_names]).run()
 

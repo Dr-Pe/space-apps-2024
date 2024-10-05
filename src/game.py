@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pygame
 import pygame_menu
@@ -8,6 +9,9 @@ pygame.mixer.init(frequency=44100, size=-16, channels=2)
 class Game:
 
     def __init__(self, back_images):
+        img_dir = os.path.join(os.path.dirname(
+            os.path.dirname(__file__)), 'static/menu')
+
         self.screen = pygame.display.set_mode((1280, 720))
         self.clock = pygame.time.Clock()
         self.running = True
@@ -19,13 +23,38 @@ class Game:
 
         self.menu = pygame_menu.Menu(
             'NOMBRE DEL JUEGO', 1280, 720, theme=pygame_menu.themes.THEME_DARK)
-        self.menu.add_button('PLAY', self._play)
-        self.menu.add_button('HOW TO', print, "how to")
-        self.menu.add_button('QUIT', self.menu.close, pygame_menu.events.EXIT)
+
+        self.myimage = pygame_menu.baseimage.BaseImage(
+            image_path=os.path.join(
+                img_dir, "background.png"),
+            drawing_mode=pygame_menu.baseimage.IMAGE_MODE_REPEAT_XY
+        )
+
+        self.menu.add.banner(pygame_menu.BaseImage(image_path=os.path.join(
+            img_dir, "Play_Button-V3.png")).scale(0.25, 0.25), self._play)
+
+        self.menu.add.banner(pygame_menu.BaseImage(image_path=os.path.join(
+            img_dir, "How-to_Button-V3.png")).scale(0.25, 0.25), print, "how to")
+
+        self.menu.add.banner(pygame_menu.BaseImage(image_path=os.path.join(
+            img_dir, "Quit_Button-V3.png")).scale(0.25, 0.25), pygame_menu.events.EXIT)
 
     def run(self):
-        pygame.event.clear()
-        self.menu.mainloop(self.screen)
+        # pygame.event.clear()
+        # self.menu.mainloop(self.screen)
+
+        while self.running:
+            # Dibuja el fondo en la pantalla antes de renderizar el menú
+            self.screen.blit(self.myimage.get_surface(), (0, 0))
+
+            # Llama al mainloop del menú, renderiza el menú encima del fondo
+            self.menu.mainloop(self.screen)
+
+            # Actualiza la pantalla
+            pygame.display.flip()
+
+            # Controla los FPS
+            self.clock.tick(60)
 
     def _play(self):
         while self.running:
