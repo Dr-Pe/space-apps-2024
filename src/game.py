@@ -54,6 +54,7 @@ class Game:
             nm = self.rgb_to_nm(rgb)  # Llamar al método de conversión
 
             print(f"RGB: {rgb}, Longitud de onda: {nm} nm")
+
             self.play_sound_from_nm(nm)
 
     def set_background_image(self):
@@ -69,14 +70,23 @@ class Game:
             "Dominant Wavelength",
             sd_to_XYZ={"illuminant": illuminant},
         )
+
         return ret[0]
 
     def play_sound_from_nm(self, nm):
         # Convertir nanómetros a metros
         wavelength_m = nm * 1e-9  # convertir nm a metros
         # Calcular la frecuencia
-        frequency = 343 / wavelength_m  # velocidad del sonido / longitud de onda
-        print(f"Frecuencia: {frequency:.2f} Hz")
+        # 360 m/s
+        frequency = 360 / wavelength_m  # velocidad del sonido / longitud de onda
+
+        max_frequency = 360/(400*1e-9)
+        min_frequency = 360/(700*1e-9)
+
+        frequency = ((frequency - min_frequency) /
+                     (max_frequency - min_frequency)) * (4186-27.5) + 27.5
+
+        print(frequency)
 
         # Generar una onda sonora simple (seno)
         sample_rate = 44100
