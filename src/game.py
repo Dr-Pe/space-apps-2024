@@ -15,7 +15,7 @@ class Game:
         self.back_images = back_images
         self.current_image_index = 0
 
-        self.background_img = self.set_background_image()
+        self.background_img = self._set_background_image()
 
     def run(self):
         while self.running:
@@ -24,7 +24,7 @@ class Game:
                 self.process_event(event)
 
             # Fill the screen with the image
-            self.set_background_image()
+            self._set_background_image()
             self.screen.blit(self.background_img.background_img, (0, 0))
 
             # Render your game here
@@ -54,13 +54,13 @@ class Game:
 
             print(f"Longitud de onda: {wavelength} nm")
 
-            self.play_sound_from_wavelength(wavelength)
+            self._play_sound_from_wavelength(wavelength)
 
-    def set_background_image(self):
+    def _set_background_image(self):
         self.background_img = self.back_images[self.current_image_index]
         return self.background_img
 
-    def play_sound_from_wavelength(self, nm):
+    def _play_sound_from_wavelength(self, nm):
         # Convertir nanómetros a metros
         wavelength_m = nm * 1e-9  # convertir nm a metros
         # Calcular la frecuencia
