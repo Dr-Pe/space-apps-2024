@@ -2,6 +2,9 @@ import colour
 import numpy as np
 import pygame
 
+IMG_WIDTH = 1920
+IMG_HEIGHT = 1080
+
 
 class BackgroundImage:
 
@@ -9,7 +12,7 @@ class BackgroundImage:
         background_img = pygame.image.load(img_name)
         # TODO: Should crop the image instead of scaling
         self.background_img = pygame.transform.scale(
-            background_img, (1280, 720))
+            background_img, (IMG_WIDTH, IMG_HEIGHT))
 
     def get_dominant_wavelenght_at(self, pos):
         rgb = self.background_img.get_at(
