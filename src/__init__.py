@@ -1,7 +1,9 @@
-import pygame
-from game import Game
-from background_image import BackgroundImage
 import os
+
+import pygame
+
+from background_image import BackgroundImage
+from game import Game
 
 if __name__ == '__main__':
     # pygame setup
