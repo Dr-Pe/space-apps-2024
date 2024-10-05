@@ -1,6 +1,6 @@
-import colour
 import numpy as np
 import pygame
+import pygame_menu
 
 pygame.mixer.init(frequency=44100, size=-16, channels=2)
 
@@ -17,11 +17,21 @@ class Game:
 
         self.background_img = self._set_background_image()
 
+        self.menu = pygame_menu.Menu(
+            'NOMBRE DEL JUEGO', 1280, 720, theme=pygame_menu.themes.THEME_DARK)
+        self.menu.add_button('PLAY', self._play)
+        self.menu.add_button('HOW TO', print, "how to")
+        self.menu.add_button('QUIT', self.menu.close, pygame_menu.events.EXIT)
+
     def run(self):
+        pygame.event.clear()
+        self.menu.mainloop(self.screen)
+
+    def _play(self):
         while self.running:
             # Poll for events
             for event in pygame.event.get():
-                self.process_event(event)
+                self._process_event(event)
 
             # Fill the screen with the image
             self._set_background_image()
@@ -34,9 +44,9 @@ class Game:
 
             self.clock.tick(60)  # Limits FPS to 60
 
-        pygame.quit()
+        self.menu.close(pygame_menu.events.EXIT)
 
-    def process_event(self, event):
+    def _process_event(self, event):
         if event.type == pygame.QUIT:
             self.running = False
         elif event.type == pygame.KEYDOWN:
