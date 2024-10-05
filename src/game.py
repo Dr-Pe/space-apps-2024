@@ -1,14 +1,24 @@
-import colour
+import os
 import numpy as np
 import pygame
+import pygame_menu
 
 pygame.mixer.init(frequency=44100, size=-16, channels=2)
+
+MENU_WIDTH = 800
+MENU_HEIGHT = 600
+IMG_WIDTH = 1920
+IMG_HEIGHT = 1080
 
 
 class Game:
 
     def __init__(self, back_images):
-        self.screen = pygame.display.set_mode((1280, 720))
+        img_dir = os.path.join(os.path.dirname(
+            os.path.dirname(__file__)), 'static/menu')
+
+        self.screen = pygame.display.set_mode(
+            (MENU_WIDTH, MENU_HEIGHT))
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -17,11 +27,44 @@ class Game:
 
         self.background_img = self._set_background_image()
 
+        ico = pygame.image.load(os.path.join(
+            img_dir, "logo1616.ico"))
+        pygame.display.set_icon(ico)
+
+        background_menu = pygame_menu.baseimage.BaseImage(
+            image_path=os.path.join(
+                img_dir, "background.png"),
+            drawing_mode=pygame_menu.baseimage.IMAGE_MODE_FILL
+        )
+        theme_menu = pygame_menu.themes.THEME_DARK.copy()
+        theme_menu.background_color = background_menu
+
+        self.menu = pygame_menu.Menu(
+            'Caressing the void', MENU_WIDTH, MENU_HEIGHT, theme=theme_menu)
+
+        self.menu.add.banner(pygame_menu.BaseImage(image_path=os.path.join(
+            img_dir, "Play_Button-V3.png")).scale(0.25, 0.25), self._play)
+        self.menu.add.vertical_margin(15)
+
+        self.menu.add.banner(pygame_menu.BaseImage(image_path=os.path.join(
+            img_dir, "How-to_Button-V3.png")).scale(0.25, 0.25), print, "how to")
+        self.menu.add.vertical_margin(15)
+
+        self.menu.add.banner(pygame_menu.BaseImage(image_path=os.path.join(
+            img_dir, "Quit_Button-V3.png")).scale(0.25, 0.25), pygame_menu.events.EXIT)
+
     def run(self):
+        pygame.event.clear()
+        self.menu.mainloop(self.screen)
+
+    def _play(self):
+        self.screen = pygame.display.set_mode(
+            (IMG_WIDTH, IMG_HEIGHT), pygame.RESIZABLE | pygame.FULLSCREEN)
+
         while self.running:
             # Poll for events
             for event in pygame.event.get():
-                self.process_event(event)
+                self._process_event(event)
 
             # Fill the screen with the image
             self._set_background_image()
@@ -34,9 +77,9 @@ class Game:
 
             self.clock.tick(60)  # Limits FPS to 60
 
-        pygame.quit()
+        self.menu.close(pygame_menu.events.EXIT)
 
-    def process_event(self, event):
+    def _process_event(self, event):
         if event.type == pygame.QUIT:
             self.running = False
         elif event.type == pygame.KEYDOWN:
@@ -47,13 +90,13 @@ class Game:
             elif event.key == pygame.K_LEFT:
                 self.current_image_index = (
                     self.current_image_index - 1) % len(self.back_images)
+            elif event.key == pygame.K_ESCAPE:
+                self.menu.close(pygame_menu.events.EXIT)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             # Obtener el color RGB en la posición del mouse
             wavelength = self.background_img.get_dominant_wavelenght_at(
                 event.pos)
-
             print(f"Longitud de onda: {wavelength} nm")
-
             self._play_sound_from_wavelength(wavelength)
 
     def _set_background_image(self):
