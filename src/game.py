@@ -169,5 +169,5 @@ class Game:
         sound.play()
 
     def _backgroundSound(self):
-        pygame.mixer.music.load('..\music\olas.wav')
+        pygame.mixer.music.load('..\music\backgroundMusic.wav')
         pygame.mixer.music.play(-1)
