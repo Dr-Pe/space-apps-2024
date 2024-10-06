@@ -1,4 +1,5 @@
 import os
+import textwrap
 import numpy as np
 import pygame
 import pygame_menu
@@ -16,6 +17,8 @@ class Game:
     def __init__(self, back_images):
         img_dir = os.path.join(os.path.dirname(
             os.path.dirname(__file__)), 'static/menu')
+        font_dir = os.path.join(os.path.dirname(
+            os.path.dirname(__file__)), 'static/font')
 
         self.screen = pygame.display.set_mode(
             (MENU_WIDTH, MENU_HEIGHT))
@@ -47,15 +50,94 @@ class Game:
         self.menu.add.vertical_margin(15)
 
         self.menu.add.banner(pygame_menu.BaseImage(image_path=os.path.join(
-            img_dir, "How-to_Button-V3.png")).scale(0.25, 0.25), print, "how to")
+            img_dir, "How-to_Button-V3.png")).scale(0.25, 0.25), self._how_to)
         self.menu.add.vertical_margin(15)
 
         self.menu.add.banner(pygame_menu.BaseImage(image_path=os.path.join(
             img_dir, "Quit_Button-V3.png")).scale(0.25, 0.25), pygame_menu.events.EXIT)
 
+        self.modal_bg_img = pygame.image.load(os.path.join(
+            img_dir, "How-to-Transparent_Splash-V3.png"))
+
     def run(self):
         pygame.event.clear()
         self.menu.mainloop(self.screen)
+
+    def _how_to(self):
+        modal_active = True
+
+        while self.running and modal_active:
+            # First, render the menu
+            self.menu.draw(self.screen)  # Draw the menu behind the modal
+
+            # Draw the modal box on top of the menu
+            modal_width, modal_height = self.modal_bg_img.get_size()  # 450, 400
+            modal_surface = pygame.Surface(
+                (modal_width, modal_height))
+
+            # ajusta la opacidad
+            modal_surface.set_alpha(255)
+            # modal_surface.fill((100, 100, 100))  # Dark gray modal background
+            modal_rect = modal_surface.get_rect(
+                center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
+
+            # Scale background img
+            scaled_bg_img = pygame.transform.scale(
+                self.modal_bg_img, (modal_width, modal_height))
+
+            # Draw modal background
+            modal_surface.blit(scaled_bg_img, (0, 0))
+            # Render the "HOW TO" title in the center of the modal box
+            # Larger font for the title
+            font_title = pygame.font.Font(None, 32)
+            title_text = " "
+            title_surface = font_title.render(
+                title_text, True, (0, 0, 0))  # black text
+            title_rect = title_surface.get_rect(
+                center=(modal_rect.width // 2, modal_rect.height // 7))  # Move title down a bit
+
+            # Render the instructions text (with a considerable gap)
+            # Adjust font size for readability
+            font = pygame.font.Font(None, 28)
+
+            text = """ ."""
+
+            # Use textwrap to split the text into lines that fit the modal width
+            # Adjust width to fit your modal
+            wrapped_text = textwrap.wrap(text, width=40)
+
+            # Calculate starting position for wrapped text (increase gap between title and content)
+            start_y = title_rect.bottom + 50
+
+            # Render each line of text
+            for i, line in enumerate(wrapped_text):
+                text_surface = font.render(
+                    line, True, (0, 0, 0))  # black text
+                text_rect = text_surface.get_rect(
+                    center=(modal_rect.width // 2, start_y + i * font.get_height()))
+                modal_surface.blit(text_surface, text_rect)
+
+            # Blit modal onto the screen (including title and text)
+            self.screen.blit(modal_surface, modal_rect)
+            self.screen.blit(title_surface, title_rect.move(
+                modal_rect.left, modal_rect.top))  # Ensure title is inside the modal
+
+            # Handle events
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    modal_active = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    # Close the modal when clicked anywhere on the screen (not just inside the modal)
+                    modal_active = False
+                    self.menu.close()  # Close the menu when modal is closed
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        modal_active = False  # Close the modal on Escape key
+
+            # Update the display
+            pygame.display.flip()
+            self.clock.tick(60)
 
     def _play(self):
         self.screen = pygame.display.set_mode(
@@ -110,11 +192,11 @@ class Game:
         # 360 m/s
         frequency = 360 / wavelength_m  # velocidad del sonido / longitud de onda
 
-        max_frequency = 360/(400*1e-9)
-        min_frequency = 360/(700*1e-9)
+        max_frequency = 360 / (400 * 1e-9)
+        min_frequency = 360 / (700 * 1e-9)
 
         frequency = ((frequency - min_frequency) /
-                     (max_frequency - min_frequency)) * (4186-27.5) + 27.5
+                     (max_frequency - min_frequency)) * (4186 - 27.5) + 27.5
 
         print(frequency)
 

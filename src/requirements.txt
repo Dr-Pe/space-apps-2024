@@ -1,0 +1,7 @@
+pygame
+pygame-menu
+colour-science
+numpy
+networkx
+pyinstaller
+matplotlib
