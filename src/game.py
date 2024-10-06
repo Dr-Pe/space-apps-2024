@@ -71,9 +71,13 @@ class Game:
             self.menu.draw(self.screen)  # Draw the menu behind the modal
 
             # Draw the modal box on top of the menu
-            modal_width, modal_height = 450, 400
-            modal_surface = pygame.Surface((modal_width, modal_height))
-            modal_surface.fill((100, 100, 100))  # Dark gray modal background
+            modal_width, modal_height = self.modal_bg_img.get_size()  # 450, 400
+            modal_surface = pygame.Surface(
+                (modal_width, modal_height))
+
+            # ajusta la opacidad
+            modal_surface.set_alpha(255)
+            # modal_surface.fill((100, 100, 100))  # Dark gray modal background
             modal_rect = modal_surface.get_rect(
                 center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
 
@@ -86,7 +90,7 @@ class Game:
             # Render the "HOW TO" title in the center of the modal box
             # Larger font for the title
             font_title = pygame.font.Font(None, 32)
-            title_text = "How to use:"
+            title_text = " "
             title_surface = font_title.render(
                 title_text, True, (0, 0, 0))  # black text
             title_rect = title_surface.get_rect(
@@ -96,8 +100,7 @@ class Game:
             # Adjust font size for readability
             font = pygame.font.Font(None, 28)
 
-            text = """Discover the universe through sound! Click anywhere on the image and a one-of-a-kind auditory experience 
-            will be created based on the liminal frequency data from the JWST. Each click reveals a new cosmic sound."""
+            text = """ ."""
 
             # Use textwrap to split the text into lines that fit the modal width
             # Adjust width to fit your modal
