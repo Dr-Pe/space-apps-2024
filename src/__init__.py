@@ -8,6 +8,7 @@ from game import Game
 if __name__ == '__main__':
     # pygame setup
     pygame.init()
+    pygame.display.set_caption("Astronotes by 1616")
 
     # Get the path to the "static" dir
     static_dir = os.path.join(os.path.dirname(
