@@ -59,12 +59,6 @@ class Game:
         self.modal_bg_img = pygame.image.load(os.path.join(
             img_dir, "How-to-Transparent_Splash-V3.png"))
 
-        font_path = os.path.join(
-            font_dir, "ComingSoon-Regular.ttf")
-
-        self.font_tittle = pygame.font.Font(font_path, 25)
-        self.font_text = pygame.font.Font(font_path, 20)
-
     def run(self):
         pygame.event.clear()
         self.menu.mainloop(self.screen)
@@ -91,7 +85,7 @@ class Game:
             modal_surface.blit(scaled_bg_img, (0, 0))
             # Render the "HOW TO" title in the center of the modal box
             # Larger font for the title
-            font_title = self.font_tittle  # pygame.font.Font(None, 32)
+            font_title = pygame.font.Font(None, 32)
             title_text = "How to use:"
             title_surface = font_title.render(
                 title_text, True, (0, 0, 0))  # black text
@@ -100,7 +94,7 @@ class Game:
 
             # Render the instructions text (with a considerable gap)
             # Adjust font size for readability
-            font = self.font_text  # pygame.font.Font(None, 28)
+            font = pygame.font.Font(None, 28)
 
             text = """Discover the universe through sound! Click anywhere on the image and a one-of-a-kind auditory experience 
             will be created based on the liminal frequency data from the JWST. Each click reveals a new cosmic sound."""
