@@ -1,8 +1,8 @@
 import os
-import textwrap
 import numpy as np
 import pygame
 import pygame_menu
+import sys
 
 pygame.mixer.init(frequency=44100, size=-16, channels=2)
 
@@ -82,7 +82,8 @@ class Game:
     def _quit_game(self):
         self.how_to_sound_in.play()
         pygame.time.delay(150)
-        pygame_menu.events.EXIT()
+        pygame.quit()
+        sys.exit()
 
     def _how_to(self):
         self.how_to_sound_in.play()
@@ -138,8 +139,6 @@ class Game:
 
             self.clock.tick(60)  # Limits FPS to 60
 
-        self.menu.close(pygame_menu.events.EXIT)
-
     def _process_event(self, event):
         if event.type == pygame.QUIT:
             self.running = False
@@ -154,7 +153,8 @@ class Game:
                 self.current_image_index = (
                     self.current_image_index - 1) % len(self.back_images)
             elif event.key == pygame.K_ESCAPE:
-                self.menu.close(pygame_menu.events.EXIT)
+                pygame.quit()
+                sys.exit()
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             # Obtener el color RGB en la posición del mouse
