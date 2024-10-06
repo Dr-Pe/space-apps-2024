@@ -40,14 +40,14 @@ class Game:
         theme_menu.background_color = background_menu
 
         self.menu = pygame_menu.Menu(
-            'Caressing the void', MENU_WIDTH, MENU_HEIGHT, theme=theme_menu)
+            'Astronotes', MENU_WIDTH, MENU_HEIGHT, theme=theme_menu)
 
         self.menu.add.banner(pygame_menu.BaseImage(image_path=os.path.join(
             img_dir, "Play_Button-V3.png")).scale(0.25, 0.25), self._play)
         self.menu.add.vertical_margin(15)
 
         self.menu.add.banner(pygame_menu.BaseImage(image_path=os.path.join(
-            img_dir, "How-to_Button-V3.png")).scale(0.25, 0.25), print, "how to")
+            img_dir, "How-to_Button-V3.png")).scale(0.25, 0.25), self._open_how_to_use)
         self.menu.add.vertical_margin(15)
 
         self.menu.add.banner(pygame_menu.BaseImage(image_path=os.path.join(
@@ -62,6 +62,7 @@ class Game:
             (IMG_WIDTH, IMG_HEIGHT), pygame.RESIZABLE | pygame.FULLSCREEN)
 
         self._backgroundSound()
+        self.running=True
         while self.running:
             # Poll for events
             for event in pygame.event.get():
@@ -99,6 +100,32 @@ class Game:
                 event.pos)
             print(f"Longitud de onda: {wavelength} nm")
             self._play_sound_from_wavelength(wavelength)
+    
+    def _open_how_to_use(self):
+        
+        img_dir = os.path.join(os.path.dirname(
+            os.path.dirname(__file__)), 'static/menu')
+        #imp = pygame.image.load("..\static\menu\How-to-Transparent_Splash-V3.png").convert()
+        imp = pygame.image.load(os.path.join(
+            img_dir, "How-to-Transparent_Splash-V3.png")
+            ).convert()
+        img_width, img_height = imp.get_size()
+        screen_width, screen_height = self.screen.get_size()
+        x = (screen_width - img_width) // 2
+        y = (screen_height - img_height) // 2
+        self.screen.blit(imp, (x, y))
+        pygame.display.flip()
+        self.running=True
+        while self.running:
+            # Poll for events
+            for event in pygame.event.get():
+                self._process_event_how(event)
+        pygame.display.flip()
+
+    def _process_event_how(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                self.running = False
 
     def _set_background_image(self):
         self.background_img = self.back_images[self.current_image_index]
