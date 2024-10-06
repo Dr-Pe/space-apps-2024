@@ -1,6 +1,5 @@
 import os
 import textwrap
-
 import numpy as np
 import pygame
 import pygame_menu
@@ -55,11 +54,12 @@ class Game:
         self.menu.add.banner(pygame_menu.BaseImage(image_path=os.path.join(
             img_dir, "Quit_Button-V3.png")).scale(0.25, 0.25), pygame_menu.events.EXIT)
 
+        self.modal_bg_img = pygame.image.load(os.path.join(
+            img_dir, "How-to-Transparent_Splash-V3.png"))
+
     def run(self):
         pygame.event.clear()
         self.menu.mainloop(self.screen)
-
-    import textwrap
 
     def _how_to(self):
         modal_active = True
@@ -75,27 +75,38 @@ class Game:
             modal_rect = modal_surface.get_rect(
                 center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
 
+            # Scale background img
+            scaled_bg_img = pygame.transform.scale(
+                self.modal_bg_img, (modal_width, modal_height))
+
+            # Draw modal background
+            modal_surface.blit(scaled_bg_img, (0, 0))
             # Render the "HOW TO" title in the center of the modal box
-            font_title = pygame.font.Font(None, 32)  # Larger font for the title
+            # Larger font for the title
+            font_title = pygame.font.Font(None, 32)
             title_text = "HOW TO:"
-            title_surface = font_title.render(title_text, True, (255, 255, 255))  # White text
+            title_surface = font_title.render(
+                title_text, True, (255, 255, 255))  # White text
             title_rect = title_surface.get_rect(
                 center=(modal_rect.width // 2, modal_rect.height // 6))  # Move title down a bit
 
             # Render the instructions text (with a considerable gap)
-            font = pygame.font.Font(None, 28)  # Adjust font size for readability
+            # Adjust font size for readability
+            font = pygame.font.Font(None, 28)
             text = """Discover the universe through sound! Click anywhere on the image and a one-of-a-kind auditory experience 
             will be created based on the liminal frequency data from the JWST. Each click reveals a new cosmic sound."""
 
             # Use textwrap to split the text into lines that fit the modal width
-            wrapped_text = textwrap.wrap(text, width=40)  # Adjust width to fit your modal
+            # Adjust width to fit your modal
+            wrapped_text = textwrap.wrap(text, width=40)
 
             # Calculate starting position for wrapped text (increase gap between title and content)
             start_y = title_rect.bottom + 80
 
             # Render each line of text
             for i, line in enumerate(wrapped_text):
-                text_surface = font.render(line, True, (255, 255, 255))  # White text
+                text_surface = font.render(
+                    line, True, (255, 255, 255))  # White text
                 text_rect = text_surface.get_rect(
                     center=(modal_rect.width // 2, start_y + i * font.get_height()))
                 modal_surface.blit(text_surface, text_rect)
@@ -151,10 +162,10 @@ class Game:
             if event.key == pygame.K_RIGHT:
                 # Change to the next image
                 self.current_image_index = (
-                                                   self.current_image_index + 1) % len(self.back_images)
+                    self.current_image_index + 1) % len(self.back_images)
             elif event.key == pygame.K_LEFT:
                 self.current_image_index = (
-                                                   self.current_image_index - 1) % len(self.back_images)
+                    self.current_image_index - 1) % len(self.back_images)
             elif event.key == pygame.K_ESCAPE:
                 self.menu.close(pygame_menu.events.EXIT)
         elif event.type == pygame.MOUSEBUTTONDOWN:
