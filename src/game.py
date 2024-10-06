@@ -103,36 +103,125 @@ class Game:
         self.background_img = self.back_images[self.current_image_index]
         return self.background_img
 
+    # def _play_sound_from_wavelength(self, nm):
+    #     # Convertir nanómetros a metros
+    #     wavelength_m = nm * 1e-9  # convertir nm a metros
+    #     # Calcular la frecuencia
+    #     frequency = 360 / wavelength_m  # velocidad del sonido / longitud de onda
+
+    #     max_frequency = 360 / (400 * 1e-9)
+    #     min_frequency = 360 / (700 * 1e-9)
+
+    #     frequency = ((frequency - min_frequency) /
+    #                 (max_frequency - min_frequency)) * (4186 - 27.5) + 27.5
+
+    #     print(frequency)
+
+    #     # Generar el sonido similar a una trompeta
+    #     sample_rate = 44100
+    #     duration = 1.0  # duración en segundos
+    #     t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
+
+    #     # Combinar varias ondas senoidales para simular el timbre del órgano
+    #     sound_wave = (1 * np.sin(  np.pi * frequency * t) + 
+                    
+    #                 0.5 * np.sin(2 * np.pi  * frequency * t + 0.0)  +  # primer armónico
+    #                 0.3 * np.sin(3 * np.pi  * frequency * t + 0.0) +  # segundo armónico
+    #                 0.25 * np.sin(4 * np.pi  * frequency * t + 0.0) +  # tercer armónico
+    #                 0.20 * np.sin(5 * np.pi  * frequency * t + 0.0))
+
+    #     # Crear envolvente: ataque más largo, sostenido prolongado
+    #     attack_duration = 0.4  # Duración de ataque en segundos
+    #     sustain_duration = 1.5  # Duración de sostenido en segundos
+    #     decay_duration = 0.5  # Duración de caída en segundos
+
+    #     # Definir la envolvente
+    #     attack = np.linspace(0, 1, int(sample_rate * attack_duration))
+    #     sustain = np.ones(int(sample_rate * sustain_duration))
+    #     decay = np.linspace(1, 0, int(sample_rate * decay_duration))
+
+    #     # Concatenar partes de la envolvente
+    #     envelope = np.concatenate((attack, sustain, decay))
+
+    #     # Limitar la envolvente a la longitud del sonido
+    #     if len(envelope) < len(sound_wave):
+    #         envelope = np.pad(envelope, (0, len(sound_wave) - len(envelope)), 'constant')
+    #     else:
+    #         envelope = envelope[:len(sound_wave)]
+
+    #     # Aplicar la envolvente
+    #     organ_sound = sound_wave * envelope
+
+    #     # Convertir a tipo de datos de audio
+    #     organ_sound = (organ_sound * 32767).astype(np.int16)  # convertir a int16
+    #     # Si es estéreo, duplicamos el canal
+    #     organ_sound = organ_sound.reshape(-1, 1)  # Convertir a 2D
+    #     organ_sound = np.column_stack((organ_sound, organ_sound))  # Crear un array estéreo
+
+    #     # Crear un objeto de sonido y reproducirlo
+    #     sound = pygame.sndarray.make_sound(organ_sound)
+    #     sound.play()
+
+    #de momento a espera
+    def _low_pass_filter(self, signal, alpha=0.1):
+        filtered_signal = np.zeros_like(signal)
+        for i in range(1, len(signal)):
+            filtered_signal[i] = alpha * signal[i] + (1 - alpha) * filtered_signal[i - 1]
+        return filtered_signal
+
     def _play_sound_from_wavelength(self, nm):
+
         # Convertir nanómetros a metros
         wavelength_m = nm * 1e-9  # convertir nm a metros
         # Calcular la frecuencia
-        # 360 m/s
         frequency = 360 / wavelength_m  # velocidad del sonido / longitud de onda
 
-        max_frequency = 360/(400*1e-9)
-        min_frequency = 360/(700*1e-9)
+        max_frequency = 360 / (400 * 1e-9)
+        min_frequency = 360 / (700 * 1e-9)
 
         frequency = ((frequency - min_frequency) /
-                     (max_frequency - min_frequency)) * (4186-27.5) + 27.5
+                    (max_frequency - min_frequency)) * (4186 - 27.5) + 27.5
 
         print(frequency)
 
-        # Generar una onda sonora simple (seno)
+        # Generar el sonido similar a un órgano de iglesia
         sample_rate = 44100
-        duration = 1.0  # duración en segundos
-        t = np.linspace(0, duration, int(
-            sample_rate * duration), endpoint=False)
-        sound_wave = 0.5 * np.sin(2 * np.pi * frequency * t)  # onda senoidal
+        duration = 2.0  # duración en segundos
+        t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
+
+        
+        sound_wave = (0.4 * np.sin(2 * np.pi * frequency * t) + 
+                    0.2 * np.sin(2 * np.pi * 1.5 * frequency * t))  # onda senoidal
+
+        attack_duration = 0.5  # Duración de ataque en segundos
+        sustain_duration = 1.5  # Duración de sostenido en segundos
+        decay_duration = 0.5  # Duración de caída en segundos
+
+
+        attack = np.linspace(0, 1, int(sample_rate * attack_duration))
+        sustain = np.ones(int(sample_rate * sustain_duration))
+        decay = np.linspace(1, 0, int(sample_rate * decay_duration))
+
+        
+        envelope = np.concatenate((attack, sustain, decay))
+
+        
+        if len(envelope) < len(sound_wave):
+            envelope = np.pad(envelope, (0, len(sound_wave) - len(envelope)), 'constant')
+        else:
+            envelope = envelope[:len(sound_wave)]
+
+        
+        organ_sound = sound_wave * envelope
+        
+        # Aplicar filtro pasa-bajos deprecado
+        #organ_sound = self._low_pass_filter(organ_sound)
 
         # Convertir a tipo de datos de audio
-        sound_wave = (sound_wave * 32767).astype(np.int16)  # convertir a int16
-        # Si es estéreo, duplicamos el canal (lo seteamos como estereo en el init, revisar)
-        sound_wave = sound_wave.reshape(-1, 1)  # Convertir a 2D
-        sound_wave = np.column_stack(
-            (sound_wave, sound_wave))  # Crear un array estéreo
+        organ_sound = (organ_sound * 32767).astype(np.int16)
+        
+        organ_sound = organ_sound.reshape(-1, 1)
+        organ_sound = np.column_stack((organ_sound, organ_sound))  
 
-        # Crear un objeto de sonido y reproducirlo
-        # Sin flatten o reshape, debería funcionar
-        sound = pygame.sndarray.make_sound(sound_wave)
+        sound = pygame.sndarray.make_sound(organ_sound)
         sound.play()
